@@ -57,6 +57,18 @@ public interface PlaceService {
   //  코인노래방
   PlaceEntity findPlaceCoinSing();
 
+  //  별점 높은순
+  List<PlaceEntity> starHigh(String selectLocation, int selectAge, int selectPeople);
+
+  //  별점 낮은순
+  List<PlaceEntity> starLow(String selectLocation, int selectAge, int selectPeople);
+
+  //  리뷰 많은 순
+  List<PlaceEntity> reviewHigh(String selectLocation, int selectAge, int selectPeople);
+
+  //  리뷰 적은 순
+  List<PlaceEntity> reviewLow(String selectLocation, int selectAge, int selectPeople);
+
   //  공방
   PlaceEntity findPlaceGold();
 

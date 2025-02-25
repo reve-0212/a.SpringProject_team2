@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="/css/font.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <script>
+      $(document).ready(function () {
+          var nav = parseInt($("#right-nav").css('top'));
+
+          $(window).scroll(function () {
+              var scrollTop = $(window).scrollTop();
+              var nav_position = scrollTop + nav + "px";
+
+              $("#right-nav").stop().animate({
+                  "top": nav_position
+              }, 700);
+          }).scroll();
+      });
+  </script>
+  <script>
+      $(document).ready(function () {
+          // 현재 주소에서 location, age, people 가져오기
+          const url = window.location.href;
+          // console.log(url);
+          const regex = /\/place\/recommend\/([^/]+)\/(\d+)\/(\d+)/;
+          const match = url.match(regex);
+
+          const selectLocation = decodeURIComponent(match[1]);
+          const selectAge = parseInt(match[2], 10);
+          const selectPeople = parseInt(match[3], 10);
+
+          console.log("selectLocation:", selectLocation);
+          console.log("selectAge:", selectAge);
+          console.log("selectPeople:", selectPeople);
+
+          $(".placeSelect").on("change", function () {
+              const placeSelect = $("select[name=placeSelect] option:selected").val();
+
+              if (placeSelect === "starHigh") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/starHigh`
+              } else if (placeSelect === "starLow") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/starLow`
+              } else if (placeSelect === "reviewHigh") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/reviewHigh`
+              } else if (placeSelect === "reviewLow") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/reviewLow`
+              } else if(placeSelect === "default") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}`
+              }
+          });
+      });
+  </script>
+</head>
+<body>
+<div th:replace="~{/layout/header :: projectheader}"></div>
+
+<!-- 메인 활동의 디테일 항목 -->
+<section class="container">
+
+  <select class="form-select placeSelect" aria-label="Default select example" name="placeSelect">
+    <option selected>정렬 기준을 선택해 주세요</option>
+    <option value="default" class="default">기본 정렬</option>
+    <option value="starHigh" class="starHigh">별점이 높은 순</option>
+    <option value="starLow" class="starLow">별점이 낮은 순</option>
+    <option value="reviewHigh" class="reviewHigh">리뷰가 많은 순</option>
+    <option value="reviewLow" class="reviewLow">리뷰가 적은 순</option>
+  </select>
+
+  <div class="container placeContainer" style="margin-top: 150px;">
+    <div class="container d-flex row justify-content-between align-items-center">
+      <div class="col-6 d-flex" th:each="placeDetail : ${placeDetailList}">
+        <div style="margin-bottom: 20px;" th:if="${not #lists.isEmpty(placeDetail.placeImageEntityList)}">
+          <a th:href="|/place/detail/${placeDetail.placeIdx}|">
+            <img th:src="|/${placeDetail.placeImageEntityList[0].imagePath}${placeDetail.placeImageEntityList[0].imageName}|"
+                 alt="이미지" class="rounded" style="width: 200px; height: 200px; margin-right: 20px;">
+          </a>
+        </div>
+        <div>
+          <div class="justify-content-between">
+            <p style="font-weight: bold;" th:text="${placeDetail.name}">업체 이름</p>
+            <p style="word-break:keep-all;" th:text="${placeDetail.address}">업체 주소</p>
+            <p th:if="${placeDetail.averageStar == 0.0}">⭐ <span>아직 별점이 없습니다</span></p>
+            <p th:unless="${placeDetail.averageStar == 0.0}">⭐ 평균 별점: <span
+                    th:text="${#numbers.formatDecimal(placeDetail.averageStar,1,1)}">0.0</span></p>
+            <p th:if="${placeDetail.reviewCount == 0}">💬 <span>아직 리뷰가 없습니다</span></p>
+            <p th:unless="${placeDetail.reviewCount == 0}">💬 리뷰 개수: <span th:text="${placeDetail.reviewCount}">0</span>
+              개</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div th:replace="~{/layout/footer :: projectfooter}"></div>
+</body>
+</html>
