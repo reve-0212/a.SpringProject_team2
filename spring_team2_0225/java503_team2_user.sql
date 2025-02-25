@@ -34,7 +34,7 @@ CREATE TABLE `user` (
   `create_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
   `level` int DEFAULT '0' COMMENT '관리자 계정일 경우 1',
   PRIMARY KEY (`user_idx`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='유저';
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='유저';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +43,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (2,'test1','test10','세찬이',NULL,'test1','123123123123','2025','2025-02-12 09:30:26',0),(21,'test4','test6','침착',NULL,'test3@bilc.ac.kr','01012345678','2025','2025-02-14 05:19:28',0),(23,'test5','test5','호민',NULL,'test3@bilc.ac.kr','01012345678','2025','2025-02-18 01:44:41',0),(24,'test7','test8','전무',NULL,'test3@bilc.ac.kr','01012340987','2025','2025-02-18 02:20:22',0),(25,'test10','test11','우재',NULL,'test3@bilc.ac.kr','01012345679','2025','2025-02-19 01:14:42',0),(28,'test11','test','신선',NULL,'test3@bitc.ac.kr','01012345678','2025','2025-02-19 23:58:27',0),(29,'manager','manager','관리자',NULL,NULL,NULL,NULL,'2025-02-20 09:22:56',1),(31,'test','test','임인스',NULL,'test3@bitc.ac.kr','01012345678','2025','2025-02-20 05:04:10',0),(35,'testerhoon','asd123','테스터훈',NULL,'','01011112222','2025','2025-02-24 03:02:07',0);
+INSERT INTO `user` VALUES (2,'test1','test10','세찬이',NULL,'test1','123123123123','2025','2025-02-12 09:30:26',0),(21,'test4','test6','침착',NULL,'test3@bilc.ac.kr','01012345678','2025','2025-02-14 05:19:28',0),(23,'test5','test5','호민',NULL,'test3@bilc.ac.kr','01012345678','2025','2025-02-18 01:44:41',0),(24,'test7','test8','전무',NULL,'test3@bilc.ac.kr','01012340987','2025','2025-02-18 02:20:22',0),(25,'test10','test11','우재',NULL,'test3@bilc.ac.kr','01012345679','2025','2025-02-19 01:14:42',0),(29,'manager','manager','관리자',NULL,NULL,NULL,NULL,'2025-02-20 09:22:56',1),(31,'test','test','임인스',NULL,'test3@bitc.ac.kr','01012345678','2025','2025-02-20 05:04:10',0),(35,'testerhoon','asd123','테스터훈',NULL,'','01011112222','2025','2025-02-24 03:02:07',0),(37,'tested','test','리뷰어',NULL,'','01012345678','2025','2025-02-25 05:02:30',0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -56,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-25  8:51:03
+-- Dump completed on 2025-02-25 15:30:37

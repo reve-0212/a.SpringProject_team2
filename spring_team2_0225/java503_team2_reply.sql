@@ -34,7 +34,7 @@ CREATE TABLE `reply` (
   KEY `reply_user_idx_idx` (`reply_user_idx`),
   CONSTRAINT `reply_board_idx` FOREIGN KEY (`reply_board_idx`) REFERENCES `board` (`board_idx`) ON DELETE CASCADE,
   CONSTRAINT `reply_user_idx` FOREIGN KEY (`reply_user_idx`) REFERENCES `user` (`user_idx`)
-) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='댓글';
+) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='댓글';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +43,7 @@ CREATE TABLE `reply` (
 
 LOCK TABLES `reply` WRITE;
 /*!40000 ALTER TABLE `reply` DISABLE KEYS */;
-INSERT INTO `reply` VALUES (66,103,2,'세찬이','도름','2025-02-21 15:06:11'),(81,162,31,'임인스','ㅇㅇ','2025-02-24 16:17:21');
+INSERT INTO `reply` VALUES (66,103,2,'세찬이','도름','2025-02-21 15:06:11'),(81,162,31,'임인스','ㅇㅇ','2025-02-24 16:17:21'),(82,178,37,'리뷰어','참가희망','2025-02-25 14:04:03');
 /*!40000 ALTER TABLE `reply` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -56,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-25  8:51:03
+-- Dump completed on 2025-02-25 15:30:37
