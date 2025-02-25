@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="/css/font.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script>
+      $(document).ready(function () {
+          const crewBoardIdx = $(".crewBoardIdx").val();
+          console.log(crewBoardIdx);
+
+          // 목록 버튼 누르면 목록으로
+          $("#btn-list").on("click", function () {
+              history.back();
+          });
+
+          // 쓰기 버튼 누르면 crew 쓰기로
+          $("#btn-write").on("click", function () {
+              location.href = "/crew/write";
+          });
+
+          // 수정 버튼
+          $("#btn-modify").on("click", function () {
+              console.log("btn-modify");
+            let boardIdx = $(".crewBoardIdx").val();
+            location.href = `/crew/edit/${boardIdx}`;
+          })
+
+          // 삭제 버튼
+          $("#btn-delete").on("click", function (event) {
+              // console.log("btn-delete");
+              let crewNumberDelete = crewBoardIdx;
+              console.log("crewNumberDelete : " + crewNumberDelete);
+              let crewUserId = $(".crewUserId").val();
+              console.log("crewUserId : " + crewUserId);
+
+              event.preventDefault();
+              $.ajax({
+                  url: '/crew/delete',
+                  type: 'delete',
+                  data: {
+                      "crewNumberDelete": crewNumberDelete, "crewUserId": crewUserId
+                  },
+                  success: function () {
+                      alert("인원 모집 삭제 완료");
+                      location.href = "/crew";
+                  },
+                  error: function (xhr) {
+                      if (xhr.status === 403) {
+                          alert(xhr.responseText);
+                      } else {
+                          alert("인원 모집 삭제 중 오류");
+                      }
+                  }
+              });
+          });
+
+          // 댓글 보기
+          $.ajax({
+              url: `/reply/list/${crewBoardIdx}`,
+              type: "get",
+              success: function (data) {
+                  let replyShowBox = $(".replyShowBox");
+                  replyShowBox.empty();
+
+                  data.replyList.forEach(reply => {
+                      let html = `<div style='padding: 10px 10px 0 10px;'>`;
+                      html += `<input type="hidden" value="${reply.replyIdx}" class="replyIdx" id="replyIdx">`
+                      // html += `<input type="hidden" value="${reply.user.id}" class="replyUserId" id="replyUserId">`
+                      html += `<span style='font-weight: bold;' class='replyId'>${reply.userName}</span> `;
+                      html += ` <span style='font-size: small' class='replyWriteDate'>${reply.createDate}</span>`;
+                      html += `<div class='mt-2 replyContent' style='padding: 0 10px 10px 10px; word-wrap: break-word;'>${reply.comment}`;
+                      html += `<button type="button" class="deleteReplyButton btn btn-outline-danger btn-sm float-end">삭제</button></div>`;
+                      html += `</div>`
+
+                      replyShowBox.append(html);
+                  });
+              }
+          });
+
+          // 댓글 쓰기 누르면 댓글 쓰기
+          $("#replyWriteButton").on("click", function () {
+              const replyWriteComment = $("#replyWriteComment").val();
+              console.log(replyWriteComment);
+
+              $.ajax({
+                  url: `/reply/write/${crewBoardIdx}/${replyWriteComment}`,
+                  type: 'post',
+                  data: {"crewBoardIdx": crewBoardIdx, "replyWriteComment": replyWriteComment},
+                  success: function () {
+                      alert("댓글 등록 완료");
+                      location.reload();
+                  },
+                  error: function () {
+                      alert("댓글 등록 실패");
+                  }
+              });
+          });
+
+          // 댓글 삭제
+          $(document).on("click", ".deleteReplyButton", function () {
+              let replyIdx = $(this).closest("div").find(".replyIdx").val();
+              console.log(replyIdx);
+              let replyUserId = $(this).closest("div").find(".replyId").text().trim();
+              console.log(replyUserId);
+
+              $.ajax({
+                  url: `/reply/delete/${replyIdx}`,
+                  type: 'delete',
+                  data: {"replyIdx": replyIdx, "replyUserId": replyUserId},
+                  success: function () {
+                      alert("댓글 삭제 완료");
+                      location.reload();
+                  },
+                  error: function (xhr) {
+                      if (xhr.status === 403) {
+                          alert(xhr.responseText);
+                      } else {
+                          alert("댓글 삭제 중 오류");
+                      }
+                  }
+              });
+          });
+      });
+  </script>
+
+<body>
+<div th:replace="~{/layout/header :: projectheader}"></div>
+
+<main class="container container-sm mt-5" style="width: 800px;">
+  <section style="margin-top: 150px;">
+    <form id="frm" action="#" method="post">
+      <input type="hidden" id="method" name="_method">
+      <input type="hidden" class="crewBoardIdx" th:value="${crew.board_idx}">
+
+      <!--중복된 인원모집과 목록 버튼 삭제-->
+      <div class="container" style="width: 800px; padding-top: 10px; margin-top: 30px;">
+        <div class="row justify-content-between align-items-end">
+          <div class="col-auto fontTitle">
+            <h1 class="font1">인원모집</h1>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm col-1" style="margin-right: 30px;" id="btn-write">작성</button>
+        </div>
+
+        <div class="mt-4">
+          <div class="container-sm d-flex justify-content-between"
+               style="border-radius: 5px 5px 0 0; border: solid 0.4px lightgray; height: 40px; align-items: center;">
+            <div class="col-sm-8">제목
+              <input type="text" class="textFont" style="border-style: none; width: 450px;" readonly
+                     th:value="${crew.title}"></div>
+            <div class="col-sm-4">작성일
+              <input type="text" class="textFont" style="border-style: none; width: 180px;" readonly
+                     th:value="${crew.createDate}"></div>
+          </div>
+          <div class="container-sm d-flex justify-content-between"
+               style="border-radius: 0 0 5px 5px; border: solid 0.4px lightgray; border-top: none; height: 35px; align-items: center;">
+            <div class="col-sm-8 ">글쓴이
+              <input type="hidden" class="textFont crewUserId" th:value="${crew.user.id}">
+              <input type="text" class="textFont" style="border-style: none; width: 400px;" readonly th:value="${crew.user.name}">
+            </div>
+            <div class="col-sm-2">조회
+              <input type="text" class="textFont" style="border-style: none; width: 50px;" readonly
+                     th:value="${crew.hitCount}"></div>
+          </div>
+        </div>
+        <div class=" mt-3 form-floating ">
+        <textarea class="form-control textFont" name="contents" id="contents" style="height: 200px;" placeholder="내용을 입력하세요."
+                  readonly th:text="${crew.contents}">
+        </textarea>
+          <label for="contents">글 내용</label>
+        </div>
+      </div>
+
+    </form>
+  </section>
+
+  <div class="m-3">
+    <button type="button" class="btn btn-secondary" id="btn-list">목록</button>
+    <button type="button" class="btn btn-light col-1" style="margin-left: 550px;" id="btn-modify">수정</button>
+    <button type="button" class="btn btn-light text-danger col-1" id="btn-delete">삭제</button>
+  </div>
+
+  <!--   댓글 보이는 부분 -->
+  <div class="container" style="margin-top: 100px;">
+    <div>
+      <div class="border-bottom py-1"><i class="fa-regular fa-comment"></i> 댓글</div>
+      <div class="replyShowBox border-bottom">
+        <div>
+          <div>
+            <span style="font-weight: bold;">ID </span>
+            <span style="font-size: small"> 작성일</span>
+            <button type="button" class="deleteReplyButton btn btn-outline-danger btn-sm float-end">삭제</button>
+          </div>
+        </div>
+
+        <div class="mt-2" style="padding: 0 10px 10px 10px; width: 650px; word-wrap: break-word;">review 내용
+        </div>
+        <button type="button" class="deleteReplyButton btn btn-outline-danger btn-sm">삭제</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 댓글 쓰는 부분 -->
+  <div class="d-flex justify-content-evenly mt-5 border-0 rounded"
+       style="background-color: #f5f5f5; padding: 10px;">
+    <div class="col-11 d-flex justify-content-center">
+        <textarea rows="3" class="rounded border-0" style="width: 650px;"
+                  id="replyWriteComment" placeholder="명예훼손, 개인정보 유출, 분쟁 유발 허위사실 유포 등의 글은 이용약관에 의해 제재는 물론 법률에 의해 처벌받을 수 있습니다."></textarea>
+    </div>
+    <div class="col-auto">
+      <button type="button" class="fw-bold bg-white rounded border-0"
+              style="width: auto; height: 30px; margin-top: 20px;"
+              id="replyWriteButton">등록
+      </button>
+    </div>
+  </div>
+  </div>
+</main>
+
+<div th:replace="~{/layout/footer :: projectfooter}"></div>
+</body>
+</html>

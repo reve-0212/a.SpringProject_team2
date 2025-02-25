@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="/css/font.css" rel="stylesheet">
+
+  <script>
+      let isIdChecked = false; // 아이디 중복 확인 여부
+
+      $(document).ready(function () {
+          //  아이디 중복 확인
+          $("#btn-check-duplicate").click(function () {
+              let userId = $("#user-id").val().trim();
+              if (userId === "") {
+                  alert("아이디를 입력하세요.");
+                  return;
+              }
+
+              $.ajax({
+                  type: "GET",
+                  url: "/user/checkDuplicate",
+                  data: {userId: userId},
+                  dataType: "json",
+                  success: function (response) {
+                      if (response.status === "duplicate") {
+                          alert("이미 사용 중인 아이디입니다.");
+                          isIdChecked = false;
+                      } else {
+                          alert("사용 가능한 아이디입니다.");
+                          isIdChecked = true;
+                      }
+                  },
+                  error: function (xhr) {
+                      alert("중복 확인 중 오류 발생: " + xhr.responseText);
+                  }
+              });
+          });
+
+          //  회원가입 처리
+          $("#btn-join").click(function (event) {
+              event.preventDefault(); // 기본 제출 방지
+
+              let userName = $("#user-name").val().trim();
+              let userId = $("#user-id").val().trim();
+              let userPw1 = $("#user-pw1").val().trim();
+              let userPw2 = $("#user-pw2").val().trim();
+              let userBirthYear = $("#user-birthYear").val().trim();
+              let userPhone = $("#user-phone").val().trim();
+              let userEmail = $("#user-email").val().trim();
+
+              // 필수 입력값 검사
+              if (userName === "" || userId === "" || userPw1 === "" || userPw2 === "" || userBirthYear === "" || userPhone === "") {
+                  alert("모든 필수 정보를 입력해주세요.");
+                  return;
+              }
+
+              // 아이디 중복 확인 여부 검사
+              if (!isIdChecked) {
+                  alert("아이디 중복 확인을 해주세요.");
+                  return;
+              }
+
+              // 비밀번호 확인
+              if (userPw1 !== userPw2) {
+                  alert("비밀번호가 일치하지 않습니다.");
+                  return;
+              }
+
+              // AJAX 요청으로 회원가입 처리
+              $.ajax({
+                  type: "POST",
+                  url: "/user/signupProcess.do",
+                  contentType: "application/json",
+                  data: JSON.stringify({
+                      userName: userName,
+                      userId: userId,
+                      userPw: userPw1,
+                      userBirthYear: userBirthYear,
+                      userPhone: userPhone,
+                      userEmail: userEmail
+                  }),
+                  success: function (response) {
+                      if (response.status === "success") {
+                          alert("회원가입이 완료되었습니다.");
+                          window.location.href = "/user/"; // 로그인 페이지로 이동
+                      } else {
+                          alert("회원가입 실패: " + response.message);
+                      }
+                  },
+                  error: function (xhr, status, error) {
+                      alert("회원가입 중 오류 발생: " + xhr.responseText);
+                      console.error("서버 응답 코드:", xhr.status);
+                      console.error("서버 응답 텍스트:", xhr.responseText);
+                      console.error("에러 메시지:", error);
+                      alert("중복 확인 중 오류가 발생했습니다. 콘솔을 확인하세요.");
+                  }
+              });
+          });
+
+          $("#btn-reset").click(function () {
+              $("#user-name").val("");
+              $("#user-id").val("");         // 아이디 입력창 초기화
+              $("#user-pw1").val("");        // 비밀번호 입력창 초기화
+              $("#user-pw2").val("");        // 비밀번호 확인 입력창 초기화
+              $("#user-birthYear").val("");  // 생년월일 입력창 초기화
+              $("#user-phone").val("");      // 휴대전화 입력창 초기화
+              $("#user-email").val("");      // 이메일 입력창 초기화
+
+              isIdChecked = false;           // 아이디 중복 확인 상태도 초기화
+          });
+
+      });
+
+
+      // $("#btn-join").click(function (event) {
+      //     event.preventDefault(); // 기본 제출 방지
+      //
+      //    let userName = $("#user-name").val().trim();
+      //     let userId = $("#user-id").val().trim();
+      //     let userPw1 = $("#user-pw1").val().trim();
+      //     let userPw2 = $("#user-pw2").val().trim();
+      //     let userBirthYear = $("#user-birthYear").val().trim();
+      //     let userPhone = $("#user-phone").val().trim();
+      //     let userEmail = $("#user-email").val().trim();
+      //
+      //     // 필수 입력값 검사
+      //     if (userName === "" || userId === "" || userPw1 === "" || userPw2 === "" || userBirthYear === "" || userPhone === "") {
+      //         alert("모든 필수 정보를 입력해주세요.");
+      //         return;
+      //     }
+      //
+      //     // 아이디 중복 확인 여부 검사
+      //     if (!isIdChecked) {
+      //         alert("아이디 중복 확인을 해주세요.");
+      //         return;
+      //     }
+      //
+      //     // 비밀번호 확인
+      //     if (userPw1 !== userPw2) {
+      //         alert("비밀번호가 일치하지 않습니다.");
+      //         return;
+      //     }
+      //
+      //     // AJAX 요청으로 회원가입 처리
+      //     $.ajax({
+      //         type: "POST",
+      //         url: "/user/signupProcess.do",
+      //         contentType: "application/json",
+      //         data: JSON.stringify({
+      //             userName: userName,
+      //             userId: userId,
+      //             userPw: userPw1,
+      //             userBirthYear: userBirthYear,
+      //             userPhone: userPhone,
+      //             userEmail: userEmail
+      //         }),
+      //         success: function (response) {
+      //             if (response.status === "success") {
+      //                 alert("회원가입이 완료되었습니다.");
+      //                 window.location.href = "/"; // 로그인 페이지로 이동
+      //             } else {
+      //                 alert("회원가입 실패: " + response.message);
+      //             }
+      //         },
+      //         error: function (xhr, status, error) {
+      //             alert("회원가입 중 오류 발생: " + xhr.responseText);
+      //             console.error("서버 응답 코드:", xhr.status);
+      //             console.error("서버 응답 텍스트:", xhr.responseText);
+      //             console.error("에러 메시지:", error);
+      //             alert("중복 확인 중 오류가 발생했습니다. 콘솔을 확인하세요.");
+      //         }
+      //     });
+      // });
+      //
+      // $("#btn-reset").click(function () {
+      //     $("#user-name").val("");
+      //     $("#user-id").val("");         // 아이디 입력창 초기화
+      //     $("#user-pw1").val("");        // 비밀번호 입력창 초기화
+      //     $("#user-pw2").val("");        // 비밀번호 확인 입력창 초기화
+      //     $("#user-birthYear").val("");  // 생년월일 입력창 초기화
+      //     $("#user-phone").val("");      // 휴대전화 입력창 초기화
+      //     $("#user-email").val("");      // 이메일 입력창 초기화
+      //
+      //     isIdChecked = false;           // 아이디 중복 확인 상태도 초기화
+      // });
+
+
+  </script>
+
+</head>
+<body>
+<div th:replace="~{/layout/header :: projectheader}"></div>
+
+<div class="container d-flex justify-content-center" style="margin-top: 100px; margin-bottom: 100px;">
+  <div class="align-items-center p-5 rounded shadow bg-light">
+    <div><p><i class="fa-regular fa-user">&nbsp;&nbsp;</i><input type="text" id="user-name" name="=userName" placeholder="이름"
+                                                                 style="border-radius: 3px; border-style: none;">
+    </p></div>
+    <div>
+      <p><i class="fa-solid fa-user">&nbsp;&nbsp;</i><input type="text" id="user-id" name="userId" placeholder="아이디"
+                                                            style="border-radius: 3px; border-style: none;">
+        <button id="btn-check-duplicate" type="button" class="btn btn-dark btn-sm">
+          중복확인
+        </button>
+      </p>
+    </div>
+    <div><p><i class="fa-solid fa-lock">&nbsp;&nbsp;</i><input type="password" id="user-pw1" name="userPw"
+                                                               placeholder="비밀번호"
+                                                               style="border-radius: 3px; border-style: none;">
+    </p></div>
+    <div><p><i class="fa-solid fa-lock">&nbsp;&nbsp;</i><input type="password" id="user-pw2" name="userPwConfirm"
+                                                               placeholder="비밀번호 확인"
+                                                               style="border-radius: 3px; border-style: none;">
+    </p></div>
+    <div><p><i class="fa-regular fa-calendar">&nbsp;&nbsp;</i><label>생년월일 : &nbsp;</label><input type="date"
+                                                                                                 id="user-birthYear"
+                                                                                                 name="userBirthYear"
+                                                                                                 style="border-radius: 3px; border-style: none;">
+    </p></div>
+    <div><p><i class="fa-solid fa-mobile-screen">&nbsp;&nbsp;</i><input type="text" id="user-phone" name="userPhone"
+                                                                        placeholder="휴대전화번호"
+                                                                        style="border-radius: 3px; border-style: none;">
+    </p></div>
+    <div><p><i class="fa-regular fa-envelope">&nbsp;</i><input type="text" id="user-email" name="userEmail"
+                                                               placeholder="이메일[선택]"
+                                                               style="border-radius: 3px; border-style: none;">
+    </p></div>
+    <div class="d-grid gap-4">
+      <button id="btn-reset" type="reset" class="mt-3 btn btn-light btn-sm">
+        취소
+      </button>
+    </div>
+    <p></p>
+    <div class="d-grid gap-4">
+      <button id="btn-join" type="submit" class="btn btn-dark btn-sm">
+        회원가입하기
+      </button>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{/layout/footer :: projectfooter}"></div>
+</body>
+</html>
