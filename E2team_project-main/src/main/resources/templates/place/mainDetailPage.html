@@ -12,17 +12,6 @@
           integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
           crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-  <style>
-    .navbar {
-      position: absolute;
-      right: 20px;
-      top: 45%;
-      transform: translateY(-50%);
-      transition: top 0.7s ease-out;
-    }
-  </style>
-
   <script>
       $(document).ready(function () {
           var nav = parseInt($("#right-nav").css('top'));
@@ -37,12 +26,55 @@
           }).scroll();
       });
   </script>
+  <script>
+      $(document).ready(function () {
+          // 현재 주소에서 location, age, people 가져오기
+          const url = window.location.href;
+          // console.log(url);
+          const regex = /\/place\/recommend\/([^/]+)\/(\d+)\/(\d+)/;
+          const match = url.match(regex);
+
+          const selectLocation = decodeURIComponent(match[1]);
+          const selectAge = parseInt(match[2], 10);
+          const selectPeople = parseInt(match[3], 10);
+
+          console.log("selectLocation:", selectLocation);
+          console.log("selectAge:", selectAge);
+          console.log("selectPeople:", selectPeople);
+
+          $(".placeSelect").on("change", function () {
+              const placeSelect = $("select[name=placeSelect] option:selected").val();
+
+              if (placeSelect === "starHigh") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/starHigh`
+              } else if (placeSelect === "starLow") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/starLow`
+              } else if (placeSelect === "reviewHigh") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/reviewHigh`
+              } else if (placeSelect === "reviewLow") {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}/reviewLow`
+              } else {
+                  location.href=`/place/recommend/${selectLocation}/${selectAge}/${selectPeople}`
+              }
+          });
+      });
+  </script>
 </head>
 <body>
 <div th:replace="~{/layout/header :: projectheader}"></div>
 
 <!-- 메인 활동의 디테일 항목 -->
 <section class="container">
+
+  <select class="form-select placeSelect" aria-label="Default select example" name="placeSelect">
+    <option selected>정렬 기준을 선택해 주세요</option>
+    <option value="default" class="default">기본 정렬</option>
+    <option value="starHigh" class="starHigh">별점이 높은 순</option>
+    <option value="starLow" class="starLow">별점이 낮은 순</option>
+    <option value="reviewHigh" class="reviewHigh">리뷰가 많은 순</option>
+    <option value="reviewLow" class="reviewLow">리뷰가 적은 순</option>
+  </select>
+
   <div class="container" style="margin-top: 150px;">
     <div class="container d-flex row justify-content-between align-items-center">
       <div class="col-6 d-flex" th:each="placeDetail : ${placeDetailList}">
